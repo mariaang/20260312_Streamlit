@@ -11,12 +11,19 @@ st.set_page_config(page_title="AI Job Market Analysis", layout="wide", page_icon
 # --- CARGA DE DATOS ---
 @st.cache_data
 def load_data():
-    # Usando el snippet proporcionado
-    df = kagglehub.load_dataset(
-        KaggleDatasetAdapter.PANDAS,
-        "shree0910/ai-and-data-science-job-market-dataset-20202026",
-        "ai_job_market_insights.csv", # Nombre estándar del archivo en ese dataset
-    )
+    # 1. Descargamos el dataset completo
+    path = kagglehub.dataset_download("shree0910/ai-and-data-science-job-market-dataset-20202026")
+    
+    # 2. Buscamos el archivo CSV dentro de esa carpeta
+    import os
+    files = [f for f in os.listdir(path) if f.endswith('.csv')]
+    
+    if not files:
+        raise FileNotFoundError("No se encontró ningún archivo CSV en el dataset.")
+    
+    # 3. Cargamos el primer CSV que encuentre (el principal)
+    full_path = os.path.join(path, files[0])
+    df = pd.read_csv(full_path)
     return df
 
 try:
@@ -122,3 +129,4 @@ elif menu == "📑 Documentación":
 
 st.sidebar.markdown("---")
 st.sidebar.write("👤 **Autora:** Maria Angela Arrieta A.")
+
